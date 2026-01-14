@@ -49,7 +49,7 @@ function getRandomEmoji() {
 async function loadFolders(path, containerId) {
     const owner = "huonghaohoatb-art";
     const repo = "tainguyen";
-    const branch = "master";
+    const branch = "main";
 
     const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
     const res = await fetch(url);
@@ -88,4 +88,4 @@ async function loadFolders(path, containerId) {
 }
 
 // GỌI HÀM
-loadFolders("nes_game", "folder-list");
+loadFolders("geo", "folder-list");
