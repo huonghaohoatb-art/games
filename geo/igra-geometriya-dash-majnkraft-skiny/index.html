@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="robots" content="noindex,nofollow">
+<title>Игра Геометрия Даш - Майнкрафт Скины - Vseigru.net</title>
+<script src="https://huonghaohoatb-art.github.io/games/lib/ysdk/v2.js"></script>
+<link rel="stylesheet" href="https://huonghaohoatb-art.github.io/games/lib/game-loader/gameloader2020.css" />
+<script src="https://huonghaohoatb-art.github.io/games/lib/game-loader/gameloader2020.js"></script>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script>
+      var player;
+      var sdk;
+      var payments = null;
+
+      YaGames.init({
+        adv:{
+          onAdvClose: wasShown =>{console.info('adv closed!');
+        }
+      }
+      })
+        .then(ysdk => {
+            sdk = ysdk;
+            sdk.adv.showFullscreenAdv({callbacks:{}});
+			initPayments();
+      });
+
+      var lb;
+	  
+	  var payments = null;
+
+        function initPayments(){
+
+            sdk.getPayments({ signed: true }).then(_payments => {
+                // Покупки доступны.
+                payments = _payments;
+            }).catch(err => {
+                // Покупки недоступны. Включите монетизацию в консоли разработчика.
+                // Убедитесь, что на вкладке Покупки консоли разработчика присутствует таблица
+                // хотя бы с одним внутриигровым товаром и надписью «Покупки разрешены».
+            })
+        }
+		
+		function buyCrystalOne(){
+           payments.purchase({ id: 'crystal3000' }).then(purchase => {
+           // Покупка успешно совершена!
+           window.unityInstance.SendMessage("YandexSDK", "SetBuyingCrystalOne");
+		   })
+        }
+		
+		function buyCrystalTwo(){
+           payments.purchase({ id: 'crystal7000' }).then(purchase => {
+           // Покупка успешно совершена!
+           window.unityInstance.SendMessage("YandexSDK", "SetBuyingCrystalTwo");
+		   })
+        }
+		
+		function buyCrystalThree(){
+           payments.purchase({ id: 'crystal15000' }).then(purchase => {
+           // Покупка успешно совершена!
+           window.unityInstance.SendMessage("YandexSDK", "SetBuyingCrystalThree");
+		   })
+        }
+		
+		
+
+    function GetLeaderBoard(){
+      sdk.getLeaderboards().then(_lb => lb = _lb);
+            }
+
+    function SetLeaderBoard(score){
+      sdk.getLeaderboards()
+          .then(lb => {
+            console.log(score);
+            lb.setLeaderboardScore('LeaderBoard', score);});
+        }
+
+    function GetLeaderBoardEntries(){
+      sdk.getLeaderboards()
+          .then(lb => {lb.getLeaderboardEntries('LeaderBoard', { quantityTop: 10, includeUser: true, quantityAround: 3 }).then(res =>
+            {
+              console.log(res);
+              window.unityInstance.SendMessage('YandexSDK', 'BoardEntriesReady', JSON.stringify(res));});
+            });
+      }
+
+
+
+      function auth(){
+        initPlayer().then(() =>{
+                getUser();
+            }).catch(err => {
+             sdk.auth.openAuthDialog().then(() => {
+              initPlayer();
+              getUser();
+          });
+          });
+        }
+
+
+      function initPlayer(){
+        console.log('InitPlayerTry')
+        return sdk.getPlayer().then(_player => {
+                console.log('InitPlayer2');
+                player = _player;
+            });}
+
+      function getUser(){
+          console.log('try to get Name');
+          var data = player.getName();
+          window.unityInstance.SendMessage('YandexSDK', 'AuthenticateSuccess', data);
+          console.log('getName done');
+
+      }
+
+  function getUserData(){
+            player.getData().then(stats =>{
+              console.log('Data is getting');
+              console.log(JSON.stringify(stats));
+              GetLeaderBoard();
+              window.unityInstance.SendMessage('YandexSDK', 'DataGetting', JSON.stringify(stats));
+           });
+      }
+
+  function setUserData(_data){
+      console.log('Try Save');
+      console.log(_data);
+      player.setData({data : _data}).then(()=>{
+        console.log('saved');
+      }).catch(()=>{console.log('unsaved')});
+    }
+
+      function showFullscrenAd(){
+        sdk.adv.showFullscreenAdv({
+          callbacks: {
+            onClose: function(wasShown) {},
+            onError: function(error) {}
+          }
+        })
+      }
+
+     function showRewardedAd(id){
+        sdk.adv.showRewardedVideo({
+        callbacks: {
+            onOpen: () => {},
+            onRewarded: () => {
+                window.unityInstance.SendMessage('YandexSDK', 'RewardGetting');
+                console.log('Rewarded! Id: ' + id);},
+            onClose: () => {},
+            onError: (e) => {
+                var data = {"id" : id, "error" : error};
+                console.log('Error while open video ad:', e);
+            }
+          }
+        })
+      }
+	  
+	  function Start(){
+          var data = sdk.environment;
+          console.log(data);
+          window.unityInstance.SendMessage('YandexSDK','GettingLang',JSON.stringify(data));
+
+          var data = sdk.deviceInfo;
+          window.unityInstance.SendMessage('YandexSDK','GettingDevice',JSON.stringify(data));
+      }
+    </script>
+
+</head>
+<body>
+<script type="text/javascript">
+	var options = {
+		author: "Vseigru",
+		logo: "logo.jpg",
+		gameName: "Игра Геометрия Даш - Майнкрафт Скины",
+		gameNameEu: "Geometry Dash - Minecraft Skins",
+		gameUrl: "43412",
+		moreLink: (""),
+		allowFullscreen: true,
+		locale: "ru_RU",
+		loader: "unity2020",
+		loaderOptions: {
+			unityLoaderUrl: "Build/GeometryDashMinecraftSkins.loader.js",
+			unityConfigOptions: {
+				dataUrl: "Build/GeometryDashMinecraftSkins.data.unityweb",
+				frameworkUrl: "Build/GeometryDashMinecraftSkins.framework.js.unityweb",
+			    codeUrl: "Build/GeometryDashMinecraftSkins.wasm.unityweb",
+				streamingAssetsUrl: "StreamingAssets"
+			}
+		},
+    };
+	GameInit.load(options);	  
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'89f0f62f7ed67748',t:'MTcyMDI4MzI0MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

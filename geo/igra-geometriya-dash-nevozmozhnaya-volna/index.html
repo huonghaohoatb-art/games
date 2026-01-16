@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="robots" content="noindex,nofollow">
+<title>Игра Геометрия Даш: Невозможная Волна - Vseigru.net</title>
+<script src="https://huonghaohoatb-art.github.io/games/lib/ysdk/v2.js"></script>
+<link rel="stylesheet" href="https://huonghaohoatb-art.github.io/games/lib/game-loader/gameloader2020.css" />
+<script src="https://huonghaohoatb-art.github.io/games/lib/game-loader/gameloader2020.js"></script>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script>
+
+  		var player;
+  		var payments = null;
+		var lb;
+
+  		YaGames.init({
+  				screen: {
+  					fullscreen: true
+  				}
+  			})
+  			.then(_ysdk => {
+				console.log("<do.G> Yandex sdk inited");
+				
+  				ysdk = _ysdk;
+				ysdk.getLeaderboards().then(_lb => lb = _lb);
+				initPayments();
+				ysdk.adv.showFullscreenAdv({
+					callbacks: {
+						onClose: function(wasShown) { },
+						onError: function(error) { }
+					}
+				});
+				wasYandexInited = true;
+				
+				
+					gameReady();
+  			});
+		
+		function resizeCanvas() {
+			var pixelRatio = window.devicePixelRatio || 1;
+			var width = canvas.clientWidth * pixelRatio;
+			var height = canvas.clientHeight * pixelRatio;
+			
+			if (canvas.width != width || canvas.height != height) {
+				if (height > 720) {
+					canvas.width = Math.floor(width / height * 720);
+					canvas.height = 720;
+				}
+				else
+				{
+					canvas.width = width;
+					canvas.height = height;
+				}
+			}
+		}
+
+  		// Externs
+		function initPayments() {
+            try {
+                ysdk.getPayments().then(_payments => {
+                    console.log('<do.G> Purchases are available');
+                    payments = _payments;
+                    return true;
+                }).catch(e => {
+                    console.log('<do.G> Purchases are not available', e.message);
+                })
+            } catch (e) {
+                console.error('<do.G> CRASH Init Payments: ', e.message);
+            }
+        }
+		
+		function gameReady() {
+			if (!wasYandexInited)
+			{
+				isNeedGameReady = true;
+				console.log('<do.G> gameReady could not be completed: Yandex not inited yet');
+				return;
+			}
+			
+			try {
+				ysdk.features.LoadingAPI?.ready();
+				console.log('<do.G> gameReady completed!');
+			} catch (e) {
+                console.error('<do.G> gameReady error: ', e.message);
+            }
+		}
+		
+		function auth() {
+  			initPlayer().then(_player => {
+
+  				if (_player.getMode() === 'lite')
+  					userWithoutLogIn();
+  				else
+  					getUser();
+
+  			}).catch(err => {
+  				userWithoutLogIn();
+  			});
+  		}
+		
+		function getLanguage() {
+			console.log('<do.G> Set language: ' + ysdk.environment.i18n.lang);
+			window.unityInstance.SendMessage('YandexSDK', 'SetLanguage', ysdk.environment.i18n.lang);
+		}
+		
+		function initPlayer() {
+  			return ysdk.getPlayer().then(_player => {
+  				player = _player;
+  				return player;
+  			});
+  		}
+		
+		function getUser() {
+  			var data = {"id" : player.getUniqueID(), "name" : player.getName(), "avatarUrl" : player.getPhoto('medium')};
+  			window.unityInstance.SendMessage('YandexSDK', 'OnAuthSucceded', JSON.stringify(data));
+  			console.log('<do.G> Profile Data: ' + JSON.stringify(data));
+  		}
+
+  		function userWithoutLogIn() {
+  			console.log('<do.G> User not log in');
+  			window.unityInstance.SendMessage('YandexSDK', 'OnAuthMissed');
+  		}
+
+  		function getUserData() {
+  			player.getData().then(stats => {
+  				window.unityInstance.SendMessage('YandexSDK', 'OnDataReceived', JSON.stringify(stats));
+  			});
+  		}
+
+  		function setUserData(_data) {
+  			console.log('<do.G> Try Save');
+  			player.setData({
+  				data: _data
+  			}).then(() => {
+  				console.log('<do.G> saved');
+  			}).catch(() => {
+  				console.log('<do.G> unsaved')
+  			});
+  		}
+		
+  		function showFullscrenAd() {
+  			ysdk.adv.showFullscreenAdv({
+  				callbacks: {
+  					onClose: function(wasShown) {
+  						window.unityInstance.SendMessage('YandexSDK', 'OnInterstitialClose');
+  					},
+  					onError: function(error) {
+  						console.log('<do.G> Error while open Fullscreen video ad:', error);
+  						window.unityInstance.SendMessage('YandexSDK', 'OnInterstitialError');
+  					}
+  				}
+  			})
+  		}
+
+  		function showRewardedAd() {
+  			ysdk.adv.showRewardedVideo({
+				callbacks: {
+					onOpen: () => {},
+					onRewarded: () => {
+						window.unityInstance.SendMessage('YandexSDK', 'OnRewarded');
+						console.log('<do.G> Rewarded!');
+					},
+					onClose: () => {
+						window.unityInstance.SendMessage('YandexSDK', 'OnRewardedClosed');
+						console.log('<do.G> Rewarded video ad closed.');
+					},
+					onError: (e) => {
+						window.unityInstance.SendMessage('YandexSDK', 'OnRewardedError');
+						console.log('<do.G> Error while open rewarded video ad:', e);
+					}
+				}
+			})
+  		}
+
+		function openNewTab(_url) {
+  			var isMacLike = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
+			
+			if (isMacLike)
+				window.open(_url,"_top")
+			else
+				window.open(_url,'_blank');
+  		}
+		
+		function showRateApp() {
+  			ysdk.feedback.canReview()
+				.then(({ value, reason }) => {
+					if (value) {
+						ysdk.feedback.requestReview()
+							.then(({ feedbackSent }) => {
+								console.log("<do.G> " + feedbackSent);
+							})
+					} else {
+						console.log("<do.G> " + reason)
+					}
+				})
+  		}
+		
+		// Leaderboard
+		function setLeaderboard(name, score) {
+		  console.log("<do.G> Setting leaderboard: " + name + ", score: " + score);
+		  lb.setLeaderboardScore(name, score);
+		}
+		
+		function getAuthLeaderboardEntries() {
+		  lb.getLeaderboardEntries('leaderboard', { quantityTop: 5, includeUser: true })
+			.then(res => {
+			  for (i in res.entries)
+				res.entries[i].player["avatarURL"] = res.entries[i].player.getAvatarSrc("medium");
+			  window.unityInstance.SendMessage('YandexSDK', 'OnEntriesReady', JSON.stringify(res));
+		    });
+		}
+		
+		function getLeaderboardEntries() {
+		  lb.getLeaderboardEntries('leaderboard', { quantityTop: 5 })
+		    .then(res => {
+			  for (i in res.entries)
+				res.entries[i].player["avatarURL"] = res.entries[i].player.getAvatarSrc("medium");
+			  window.unityInstance.SendMessage('YandexSDK', 'OnEntriesReady', JSON.stringify(res));
+			});
+		}
+		
+		function getPlayerLeaderboard() {
+		  lb.getLeaderboardPlayerEntry('leaderboard')
+		    .then(res => {
+			  window.unityInstance.SendMessage('YandexSDK', 'OnPlayerLeaderboardReceive', JSON.stringify(res));
+			});
+		}
+		
+		// Payments
+		function consumePurchases() {
+            try {
+                if (payments != null) {
+                    payments.getPurchases().then(purchases => {
+                        console.log('<do.G> Unprocessed purchases: ', purchases.length);
+                        for (i = 0; i < purchases.length; i++) {
+                            payments.consumePurchase(purchases[i].purchaseToken);
+                            window.unityInstance.SendMessage('YandexSDK', 'OnConsumePurchase', purchases[i].productID);
+                        }
+                    });
+                }
+                else console.log('<do.G> Consume purchases: payments null');
+            } catch (e) {
+                console.error('<do.G> CRASH Consume purchases: ', e.message);
+            }
+        }
+		
+		function buyPayments(id) {
+            try {
+                if (payments != null) {
+                    payments.purchase(id).then(() => {
+                        console.log('<do.G> Purchase Success');
+                        consumePurchase(id);
+                        setFocus();
+                    }).catch(e => {
+						console.error(`<do.G> Purchase Failed (id: ${id}): ${e.message}`);
+                        window.unityInstance.SendMessage('YandexSDK', 'OnPurchaseFailed', id);
+                        setFocus();
+                    })
+                } else {
+                    console.log('<do.G> Payments == null');
+                }
+            } catch (e) {
+                console.error('<do.G> CRASH Buy Payments: ', e.message);
+                setFocus();
+            }
+        }
+		
+		function consumePurchase(id) {
+            try {
+                if (payments != null) {
+                    payments.getPurchases().then(purchases => {
+                        for (i = 0; i < purchases.length; i++) {
+                            if (purchases[i].productID === id) {
+                                payments.consumePurchase(purchases[i].purchaseToken);
+                                window.unityInstance.SendMessage('YandexSDK', 'OnPurchaseSuccess', id);
+                            }
+                        }
+                    });
+                }
+                else console.log('<do.G> Consume purchase: payments null');
+            } catch (e) {
+                console.error('<do.G> CRASH Consume Purchase: ', e.message);
+            }
+        }
+
+  	</script>
+
+</head>
+<body>
+<script type="text/javascript">
+	var options = {
+		author: "Vseigru",
+		logo: "logo.jpg",
+		gameName: "Игра Геометрия Даш: Невозможная Волна",
+		gameNameEu: "Geometry Dash: Impossible Wave",
+		gameUrl: "43688",
+		moreLink: (""),
+		allowFullscreen: true,
+		locale: "ru_RU",
+		loader: "unity2020",
+		loaderOptions: {
+			unityLoaderUrl: "Build/3fd393acf6120f261945d71452edfd6d.loader.js",
+			unityConfigOptions: {
+				dataUrl: "Build/17cfdb867243398407bce77229414c6c.data",
+				frameworkUrl: "Build/7dd76e01a8305a78f69240008126144e.framework.js",
+			    codeUrl: "Build/e357379326bbbb899ffa57a5f89bc9ac.wasm",
+				streamingAssetsUrl: "StreamingAssets"
+			}
+		},
+    };
+	GameInit.load(options);	  
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'89f0b67189e50eb3',t:'MTcyMDI4MDYzMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
