@@ -50,4 +50,3 @@ async function loadFolders(path, containerId) {
 }
 
 // GỌI HÀM
-loadFolders("geo", "folder-list");
