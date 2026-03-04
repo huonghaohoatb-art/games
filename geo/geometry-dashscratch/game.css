@@ -1,0 +1,158 @@
+body {
+    padding: 0;
+    margin: 0;
+	box-sizing: border-box;
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+canvas + * {
+        z-index: 2;
+}
+#unity-container {
+	width: 100vw;
+	height: 100vh;
+	position: absolute;
+}
+
+#unity-canvas {
+	display: block;
+    width: 100vw;
+	height: 100vh;
+}
+
+.notiRotateMobile{
+    display: none;
+    position: absolute;
+    width: 100vw;
+	height: 100vh;
+    z-index: 1000;
+    background: white;
+}
+
+.btnRotateMobile{
+    border:0px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.imageRotateMobile{
+    width: 160px;
+}
+.game-container{
+	position: relative;
+	width: 100vw;
+	height: 100vh;
+}
+#unity-loading-bar {
+	position: absolute;
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	background-image: linear-gradient(rgb(0, 0, 0), rgb(0, 102, 255));
+  }
+.logo {
+	padding: 0px 50px;
+    display: block;
+    max-width: 60vw;
+    max-height: 70vh;
+	margin: 0 auto;
+  }
+.pos_progress{
+	margin-top: 100px;
+	width: 100%;
+}
+  .progress {
+	margin: 1.5em auto;
+	max-width: 420px;
+	
+  }
+
+	.flexCenter{
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.progress .posfull,.progress .posbox{ 
+		position: absolute;
+	}
+	.progress .posfull{
+		z-index: 1;
+	}
+	.posfull .full{
+		padding-left: 2px;
+		width: 99%;
+		transform-origin: top left;
+	}
+	.progress .posfull1{
+		z-index: 2;
+	}
+	.boxfull{
+		width: 100%;
+	}
+	
+	.pos_spinner{
+		display: flex;
+		justify-content: center;
+	}
+ @media only screen and (orientation:portrait){
+    .notiRotateMobile{
+        display: block;
+    }
+
+    .hideNotiRotateMobile{
+        display: none;
+    }
+}
+
+@media only screen and (orientation:landscape) {
+    .notiRotateMobile{
+        display: none;
+    }
+}
+
+@media (max-width: 1200px) {
+	.pos_progress {
+		margin-top: 80px
+	}
+    .progress{
+		max-width: 300px;
+	}
+}
+
+@media (max-width: 1024px) {
+    .pos_progress {
+		margin-top: 60px
+	}
+    .progress{
+		max-width: 280px;
+	}
+}
+
+@media (max-width: 768px) {
+    .pos_progress {
+		margin-top: 40px
+	}
+    .progress{
+		max-width: 250px;
+	}
+}
+
+@media (max-width: 480px) {
+    .pos_progress {
+		margin-top: 30px
+	}
+    .progress{
+		max-width: 200px;
+	}
+}
+
+
