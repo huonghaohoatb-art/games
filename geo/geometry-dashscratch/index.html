@@ -3,6 +3,65 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Geometry Dash Scratch</title>
+        <script>
+(function(){
+
+function block(url){
+    console.log("🚫 Redirect blocked:", url);
+    return true;
+}
+
+/* location.assign */
+const _assign = window.location.assign;
+window.location.assign = function(url){
+    if(block(url)) return;
+    return _assign.call(location,url);
+};
+
+/* location.replace */
+const _replace = window.location.replace;
+window.location.replace = function(url){
+    if(block(url)) return;
+    return _replace.call(location,url);
+};
+
+/* window.open */
+const _open = window.open;
+window.open = function(url){
+    if(block(url)) return null;
+    return _open.apply(window,arguments);
+};
+
+/* intercept setTimeout */
+const _setTimeout = window.setTimeout;
+window.setTimeout = function(fn,t){
+    if(typeof fn === "string" && fn.includes("location")){
+        console.log("🚫 timeout redirect blocked");
+        return;
+    }
+    return _setTimeout(fn,t);
+};
+
+/* intercept setInterval */
+const _setInterval = window.setInterval;
+window.setInterval = function(fn,t){
+    if(typeof fn === "string" && fn.includes("location")){
+        console.log("🚫 interval redirect blocked");
+        return;
+    }
+    return _setInterval(fn,t);
+};
+
+/* remove meta refresh */
+new MutationObserver(()=>{
+    document.querySelectorAll('meta[http-equiv="refresh"]').forEach(e=>{
+        console.log("🚫 meta redirect removed");
+        e.remove();
+    });
+}).observe(document.documentElement,{childList:true,subtree:true});
+
+})();
+</script>
     </head>
     <body>
         <style>
@@ -32,7 +91,9 @@
             }
         </style>
         <link rel="stylesheet" href="./game.css?v=1.2">
+        
         <script>
+            
             let ads1 = '<ins class="adsbygoogle" style="display:inline-block;width:300px;height:250px" data-ad-client="ca-pub-2698922449790514" data-ad-slot="9214683020"></ins>';
             let arrRa = [1, 2, 3, 4, 5, 6];
             let randomItem = arrRa[Math.floor(Math.random() * arrRa.length)];

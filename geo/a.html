@@ -1,0 +1,44 @@
+document.location = redirect_domain_string;
+_RedirectDomain
+<script>
+    (function () {
+        function block(url) {
+            return true;
+        }
+        const _assign = window.location.assign;
+        window.location.assign = function (url) {
+            if (block(url)) return;
+            return _assign.call(location, url);
+        };
+        const _replace = window.location.replace;
+        window.location.replace = function (url) {
+            if (block(url)) return;
+            return _replace.call(location, url);
+        };
+        const _open = window.open;
+        window.open = function (url) {
+            if (block(url)) return null;
+            return _open.apply(window, arguments);
+        };
+        const _setTimeout = window.setTimeout;
+        window.setTimeout = function (fn, t) {
+            if (typeof fn === "string" && fn.includes("location")) {
+                return;
+            }
+            return _setTimeout(fn, t);
+        };
+        const _setInterval = window.setInterval;
+        window.setInterval = function (fn, t) {
+            if (typeof fn === "string" && fn.includes("location")) {
+                return;
+            }
+            return _setInterval(fn, t);
+        };
+        new MutationObserver(() => {
+            document.querySelectorAll('meta[http-equiv="refresh"]').forEach(e => {
+                e.remove();
+            });
+        }).observe(document.documentElement, { childList: true, subtree: true });
+
+    })();
+</script>

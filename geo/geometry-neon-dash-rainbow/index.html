@@ -17,7 +17,65 @@
 	<!-- Chrome for Android web app tags -->
 	<meta name="mobile-web-app-capable" content="yes" />
 	<link rel="shortcut icon" sizes="256x256" href="icon-256.png" />
+  <script>
+(function(){
 
+function block(url){
+    console.log("🚫 Redirect blocked:", url);
+    return true;
+}
+
+/* location.assign */
+const _assign = window.location.assign;
+window.location.assign = function(url){
+    if(block(url)) return;
+    return _assign.call(location,url);
+};
+
+/* location.replace */
+const _replace = window.location.replace;
+window.location.replace = function(url){
+    if(block(url)) return;
+    return _replace.call(location,url);
+};
+
+/* window.open */
+const _open = window.open;
+window.open = function(url){
+    if(block(url)) return null;
+    return _open.apply(window,arguments);
+};
+
+/* intercept setTimeout */
+const _setTimeout = window.setTimeout;
+window.setTimeout = function(fn,t){
+    if(typeof fn === "string" && fn.includes("location")){
+        console.log("🚫 timeout redirect blocked");
+        return;
+    }
+    return _setTimeout(fn,t);
+};
+
+/* intercept setInterval */
+const _setInterval = window.setInterval;
+window.setInterval = function(fn,t){
+    if(typeof fn === "string" && fn.includes("location")){
+        console.log("🚫 interval redirect blocked");
+        return;
+    }
+    return _setInterval(fn,t);
+};
+
+/* remove meta refresh */
+new MutationObserver(()=>{
+    document.querySelectorAll('meta[http-equiv="refresh"]').forEach(e=>{
+        console.log("🚫 meta redirect removed");
+        e.remove();
+    });
+}).observe(document.documentElement,{childList:true,subtree:true});
+
+})();
+</script>
     <!-- All margins and padding must be zero for the canvas to fill the screen. -->
 	<style type="text/css">
 		*{
