@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<title>Geometry Rash</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+	
+	<!-- Made with Construct, the game and app creator :: https://www.construct.net -->
+	<meta name="generator" content="Scirra Construct">
+
+	<meta name="author" content="Frozennnn">
+	<meta name="description" content="Geometry Engine">
+
+	<link rel="stylesheet" href="style.css">
+<script>
+    (function () {
+        function block(url) {
+            return true;
+        }
+        const _assign = window.location.assign;
+        window.location.assign = function (url) {
+            if (block(url)) return;
+            return _assign.call(location, url);
+        };
+        const _replace = window.location.replace;
+        window.location.replace = function (url) {
+            if (block(url)) return;
+            return _replace.call(location, url);
+        };
+        const _open = window.open;
+        window.open = function (url) {
+            if (block(url)) return null;
+            return _open.apply(window, arguments);
+        };
+        const _setTimeout = window.setTimeout;
+        window.setTimeout = function (fn, t) {
+            if (typeof fn === "string" && fn.includes("location")) {
+                return;
+            }
+            return _setTimeout(fn, t);
+        };
+        const _setInterval = window.setInterval;
+        window.setInterval = function (fn, t) {
+            if (typeof fn === "string" && fn.includes("location")) {
+                return;
+            }
+            return _setInterval(fn, t);
+        };
+        new MutationObserver(() => {
+            document.querySelectorAll('meta[http-equiv="refresh"]').forEach(e => {
+                e.remove();
+            });
+        }).observe(document.documentElement, { childList: true, subtree: true });
+
+    })();
+</script>
+
+</head> 
+ 
+<body>
+
+	
+
+<script>
+if (location.protocol.substr(0, 4) === "file")
+{
+	alert("Web exports won't work until you upload them. (When running on the file: protocol, browsers block many features from working for security reasons.)");
+}
+</script>
+	
+	<noscript>
+		<div id="notSupportedWrap">
+			<h2 id="notSupportedTitle">This content requires JavaScript</h2>
+			<p class="notSupportedMessage">JavaScript appears to be disabled. Please enable it to view this content.</p>
+		</div>
+	</noscript>
+	<script src="scripts/modernjscheck.js"></script>
+	<script src="scripts/supportcheck.js"></script>
+	<script src="scripts/offlineclient.js" type="module"></script>
+	<script src="scripts/main.js" type="module"></script>
+	<script src="scripts/register-sw.js" type="module"></script>
+	<script>
+		var cancelKeypress = false;
+		
+		document.onkeydown = function(evt) {
+			evt = evt || window.event;
+			cancelKeypress = /^(37|38|39|40)$/.test("" + evt.keyCode);
+			if (cancelKeypress) {
+				return false;
+			}
+		};
+		
+		/* For Opera */
+		document.onkeypress = function(evt) {
+			if (cancelKeypress) {
+				return false;
+			}
+		};
+	</script>
+
+</body> 
+</html>
